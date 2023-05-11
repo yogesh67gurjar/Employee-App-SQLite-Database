@@ -24,31 +24,20 @@ import android.widget.Toast;
 
 import com.example.employee_app_sqlite_database.Database.DatabaseHelper;
 import com.example.employee_app_sqlite_database.MainActivity;
+import com.example.employee_app_sqlite_database.Model.Employee;
 import com.example.employee_app_sqlite_database.R;
 import com.example.employee_app_sqlite_database.databinding.FragmentAddEmployeeBinding;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.io.File;
+import java.util.Objects;
 
 public class AddEmployee extends BottomSheetDialogFragment {
     public static final int IMAGE_CODE = 987;
     FragmentAddEmployeeBinding binding;
-
     DatabaseHelper databaseHelper;
-
     Context context;
-    String gender;
-    String name;
-    String fatherName;
-    String dob;
-    String phone;
-    String email;
-    String address;
-    String employeeId;
-    String designation;
-    String experience;
-    String salary;
-    String imagePath = null;
+    String name, fatherName, dob, phone, email, address, gender, employeeId, designation, experience, salary, imagePath = null;
 
     public AddEmployee(Context context) {
         this.context = context;
@@ -73,10 +62,10 @@ public class AddEmployee extends BottomSheetDialogFragment {
             binding.designitionEt.setText(getArguments().getString("Designation"));
             binding.experienceEt.setText(getArguments().getString("Experience"));
             binding.salaryEt.setText(String.valueOf(getArguments().getFloat("Salary")));
+
             if (getArguments().getString("imagePath") != null) {
                 getUriFromImagePath(getArguments().getString("imagePath"));
             }
-
 
             if (getArguments().getString("Gender") != null) {
                 if (getArguments().getString("Gender").equals("male")) {
@@ -133,7 +122,11 @@ public class AddEmployee extends BottomSheetDialogFragment {
                     if (maritalStatus.getText().toString().equals("married")) {
                         marriage = true;
                     }
-                    addNewEmployeeFunc(Id, name, fatherName, dob, gender, phone, email, address, employeeId, designation, experience, marriage, Float.parseFloat(salary), imagePath);
+                    try {
+                        addNewEmployeeFunc(Id, name, fatherName, dob, gender, phone, email, address, employeeId, designation, experience, marriage, Float.parseFloat(salary), imagePath);
+                    } catch (Exception ignored) {
+                    }
+
 
                 } else {
                     name = binding.nameEt.getText().toString();
@@ -163,9 +156,7 @@ public class AddEmployee extends BottomSheetDialogFragment {
                     } else {
                         addNewEmployeeFunc(0, name, fatherName, dob, gender, phone, email, address, employeeId, designation, experience, marriage, 0, imagePath);
                     }
-
                 }
-
             }
         });
 
@@ -174,8 +165,8 @@ public class AddEmployee extends BottomSheetDialogFragment {
     }
 
     private void getUriFromImagePath(String imageP) {
-        File imageFile;
-        Uri imageUri;
+        File imageFile = null;
+        Uri imageUri = null;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             imageFile = new File(imageP);
             ContentResolver resolver = context.getContentResolver();
@@ -225,19 +216,17 @@ public class AddEmployee extends BottomSheetDialogFragment {
     }
 
     public void addNewEmployeeFunc(int Id, String name, String fatherName, String dob, String gender, String phone, String email, String address, String employeeId, String designation, String experience, boolean maritalStatus, float salary, String image) {
-
         if (Id == 0) {
             // add flow
             databaseHelper.addEmployee(name, fatherName, dob, gender, phone, email, address, employeeId, designation, experience, maritalStatus, salary, image);
-//            databaseHelper.employeeDao().addEmployee(new Employee(name, fatherName, dob, gender, phone, email, address, employeeId, designation, experience, maritalStatus, salary, image));
             Toast.makeText(context, "employee added successfully", Toast.LENGTH_SHORT).show();
         } else {
             // update flow
-//            databaseHelper.employeeDao().updateEmployee(new Employee(Id, name, fatherName, dob, gender, phone, email, address, employeeId, designation, experience, maritalStatus, salary, image));
+            databaseHelper.updateEmployee(Id, name, fatherName, dob, gender, phone, email, address, employeeId, designation, experience, maritalStatus, salary, image);
             Toast.makeText(context, "employee updated successfully", Toast.LENGTH_SHORT).show();
         }
         this.dismiss();
 
-//        ((MainActivity) context).showEmployees();
+        ((MainActivity) context).showEmployees();
     }
 }

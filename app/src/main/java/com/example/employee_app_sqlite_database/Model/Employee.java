@@ -1,7 +1,6 @@
 package com.example.employee_app_sqlite_database.Model;
 
 public class Employee {
-
     private int id;
     private String name;
     private String fatherName;
@@ -19,7 +18,6 @@ public class Employee {
 
     public Employee() {
     }
-
     public Employee(int id, String name, String fatherName, String dob, String gender, String phone, String email, String address, String employeeId, String designation, String experience, boolean maritalStatus, float salary, String imagePath) {
         this.id = id;
         this.name = name;

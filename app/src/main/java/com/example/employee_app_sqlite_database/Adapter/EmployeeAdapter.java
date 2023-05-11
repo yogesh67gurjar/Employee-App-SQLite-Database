@@ -1,6 +1,5 @@
 package com.example.employee_app_sqlite_database.Adapter;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -11,12 +10,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.employee_app_sqlite_database.BottomSheetDialogFragment.AddEmployee;
+import com.example.employee_app_sqlite_database.Database.DatabaseHelper;
+import com.example.employee_app_sqlite_database.MainActivity;
 import com.example.employee_app_sqlite_database.Model.Employee;
 import com.example.employee_app_sqlite_database.R;
 
@@ -26,10 +28,20 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
 
     List<Employee> employeeList;
     Context context;
+    DatabaseHelper databaseHelper;
 
-    public EmployeeAdapter(List<Employee> employeeList, Context context) {
+    public EmployeeAdapter(List<Employee> employeeList, Context context, DatabaseHelper databaseHelper) {
         this.employeeList = employeeList;
         this.context = context;
+        this.databaseHelper = databaseHelper;
+    }
+
+    // method for filtering our recyclerview items.
+    public void filterList(List<Employee> filterlist) {
+        employeeList = filterlist;
+        // below line is to notify our adapter
+        // as change in recycler view data.
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -76,26 +88,26 @@ public class EmployeeAdapter extends RecyclerView.Adapter<EmployeeAdapter.Employ
         holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-//                AlertDialog.Builder b = new AlertDialog.Builder(context)
-//                        .setTitle("Do u really want to remove this employee ???")
-//                        .setPositiveButton("yes proceed",
-//                                new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int whichButton) {
-//                                        Employee e = databaseHelper.employeeDao().getEmployeeById(singleUnit.getId());
-//                                        databaseHelper.employeeDao().deleteEmployee(new Employee(singleUnit.getId(), singleUnit.getName(), singleUnit.getFatherName(), singleUnit.getDob(), singleUnit.getGender(), singleUnit.getPhone(), singleUnit.getEmail(), singleUnit.getAddress(), singleUnit.getEmployeeId(), singleUnit.getDesignation(), singleUnit.getExperience(), singleUnit.isMaritalStatus(), singleUnit.getSalary(), singleUnit.getImagePath()));
-//                                        Toast.makeText(context, e.getName() + " removed successfully", Toast.LENGTH_SHORT).show();
-//                                        ((MainActivity) context).showEmployees();
-//                                    }
-//                                }
-//                        )
-//                        .setNegativeButton("Cancel",
-//                                new DialogInterface.OnClickListener() {
-//                                    public void onClick(DialogInterface dialog, int whichButton) {
-//                                        dialog.dismiss();
-//                                    }
-//                                }
-//                        );
-//                b.show();
+                AlertDialog.Builder b = new AlertDialog.Builder(context)
+                        .setTitle("Do u really want to remove this employee ???")
+                        .setPositiveButton("yes proceed",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        Employee e = databaseHelper.getEmployeeById(singleUnit.getId());
+                                        databaseHelper.deleteEmployee(singleUnit.getId());
+                                        Toast.makeText(context, e.getName() + " removed successfully", Toast.LENGTH_SHORT).show();
+                                        ((MainActivity) context).showEmployees();
+                                    }
+                                }
+                        )
+                        .setNegativeButton("Cancel",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int whichButton) {
+                                        dialog.dismiss();
+                                    }
+                                }
+                        );
+                b.show();
 
                 return true;
             }
